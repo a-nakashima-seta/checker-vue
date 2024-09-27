@@ -33,6 +33,23 @@ export const useChecks = defineStore('Checks', () => {
 
     // let webOptionStatus = ref("NORMAL")
 
+    const url = ref<string>('');
+
+    const getWebSource = async () => {
+        if (!url.value) {
+            console.warn('URLが入力されていません');
+            return;
+        }
+
+        try {
+            const response = await fetch(url.value);
+            const text = await response.text();
+            console.log(text); // 取得したページソースをログに出力
+        } catch (error) {
+            console.error('ページソースの取得に失敗しました:', error);
+        }
+    };
+
 
 
     const selectAll = () => {
@@ -43,5 +60,5 @@ export const useChecks = defineStore('Checks', () => {
     }
 
 
-    return { WebCheckList, MailCheckList, checkStatus, selectAll, clearAll };
+    return { WebCheckList, MailCheckList, checkStatus, url, selectAll, clearAll, getWebSource };
 });

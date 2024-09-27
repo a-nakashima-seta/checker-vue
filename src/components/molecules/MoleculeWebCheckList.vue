@@ -12,7 +12,7 @@ const store = useChecks()
         <ul>
             <li v-for="(list, index) in store.WebCheckList" :key="index">
                 <input type="checkbox" name="" id="" :checked="store.checkStatus">
-                <label for="">{{ list }}</label>
+                <label for="list">{{ list }}</label>
             </li>
         </ul>
 
