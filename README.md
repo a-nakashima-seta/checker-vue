@@ -21,7 +21,7 @@ app/
 │   │   │   ├──MoleculeWebForm.vue
 │   │   │   └──
 │   │   ├── organisms/
-│   │   │   ├──MailFileUploader.vue
+│   │   │   ├──OrganismMailFileUploader.vue
 │   │   │   ├──OrganismSetValue.vue
 │   │   │   └──
 │   │   ├── templates/

@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { runChecks as externalRunChecks } from "../composables/checkFunc";
 
 export const useChecks = defineStore('Checks', () => {
-
-    const WebCheckList: string[] = ([
+    const WebCheckList = ref<string[]>([
         'タイトルは正しいか',
         'プリヘッダーはないか',
         '冒頭に変数はないか',
@@ -14,11 +14,10 @@ export const useChecks = defineStore('Checks', () => {
         'noindexの記述はあるか',
         'フッターが変数化されていないか',
         'GTM用の記述があるか',
-        'faviconは設定されているか'
-    ])
+        'faviconは設定されているか',
+    ]);
 
-
-    const MailCheckList: string[] = ([
+    const MailCheckList: string[] = [
         'タイトルは正しいか',
         'プリヘッダーは正しいか',
         '冒頭に変数があり、正しい申込番号が入っているか',
@@ -27,12 +26,10 @@ export const useChecks = defineStore('Checks', () => {
         '※画像がうまく表示されない方はこちらがあるか',
         '開封タグはあるか',
         'フッターが変数化されているか'
-    ])
+    ];
 
-    let checkStatus = ref<boolean>(true)
-
-    // let webOptionStatus = ref("NORMAL")
-
+    const checkedItems = ref<string[]>([...WebCheckList.value]); // 初期値として全選択
+    const checkStatus = ref<boolean>(true);
     const url = ref<string>('');
 
     const getWebSource = async () => {
@@ -45,35 +42,46 @@ export const useChecks = defineStore('Checks', () => {
             const response = await fetch('getSource.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: url.value }) // URLをオブジェクト形式で送信
+                body: JSON.stringify({ url: url.value })
             });
 
             if (!response.ok) {
                 throw new Error('ネットワークエラー: ' + response.status);
             }
 
-            const res = await response.json(); // JSONとしてレスポンスを取得
+            const res = await response.json();
 
-            // HTMLソースをテキストとして処理する場合
             if (res.html) {
-                // ここでHTMLを適切に処理・表示するコードを追加できます
-                console.log(res.html); // 取得したHTMLを表示
+                alert(res.html);
             }
 
+            return true
         } catch (error) {
             console.error('ページソースの取得に失敗しました:', error);
+
+            return false
+        }
+
+    };
+
+    const selectAll = () => {
+        checkedItems.value = [...WebCheckList.value];
+        checkStatus.value = true;
+    };
+
+    const clearAll = () => {
+        checkedItems.value = [];
+        checkStatus.value = false;
+    };
+
+    const runChecks = async () => {
+        const success = await getWebSource();
+        if (success) { 
+            externalRunChecks(checkedItems.value);
+        } else {
+            alert('チェックを実行できませんでした。');
         }
     };
 
-
-
-    const selectAll = () => {
-        checkStatus.value = true
-    }
-    const clearAll = () => {
-        checkStatus.value = false
-    }
-
-
-    return { WebCheckList, MailCheckList, checkStatus, url, selectAll, clearAll, getWebSource };
+    return { WebCheckList, MailCheckList, checkStatus, url, selectAll, clearAll, getWebSource, checkedItems, runChecks };
 });
